@@ -1,3 +1,27 @@
+# 🎬 Cineflix
+
+**Cineflix** is a modern movie search app built with **React**, **Tailwind CSS**, and **Framer Motion**, powered by the **OMDb API**. It features a sleek and responsive UI with dynamic search, type filters, animated modals, and search history. Ideal for movie lovers who want a stylish and fast way to explore films.
+
+---
+
+## ✨ Features
+
+- 🔍 **Search Movies** – Real-time search using OMDb API.
+- 🎯 **Type Filters** – Filter by movie, series, or episode.
+- 📚 **Search History** – Stores recent searches via `localStorage`.
+- 🖼️ **Responsive Grid** – 12 movies per page in a 3x4 or 4x3 layout.
+- 🎬 **Animated Modals** – Smooth transitions with Framer Motion.
+- 💅 **Modern UI** – Gradient backgrounds, blur effects, and custom loaders.
+- 🔄 **Pagination** – Easy navigation with Next & Previous buttons.
+
+---
+
+## 📸 Screenshots
+
+> **Coming Soon** – Include screenshots of:
+- Movie Grid
+- Movie Detail Modal
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
