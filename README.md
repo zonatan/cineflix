@@ -16,11 +16,15 @@
 
 ---
 
-## 📸 Screenshots
+## 🛠️ Technologies Used
 
-> **Coming Soon** – Include screenshots of:
-- Movie Grid
-- Movie Detail Modal
+| Technology | Purpose |
+|-----------|---------|
+| ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) | Frontend framework |
+| ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) | Styling framework |
+| ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white) | Animation library |
+| ![OMDb API](https://img.shields.io/badge/OMDb_API-000000?style=for-the-badge) | Movie data source |
+| ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white) | API requests |
 
 # Getting Started with Create React App
 
