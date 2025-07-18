@@ -111,7 +111,7 @@ const MovieCard = ({ movie, onClick, isFavorite, toggleFavorite }) => {
       transition={{ duration: 0.3 }}
       className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 cursor-pointer"
       onClick={() => {
-        console.log('Card clicked:', movie.imdbID); // Debugging
+        console.log('Card clicked:', movie.imdbID);
         onClick(movie.imdbID);
       }}
     >
@@ -170,7 +170,7 @@ const MovieList = ({ movies, onCardClick, favorites, toggleFavorite }) => {
 
 const FavoritesPage = ({ favorites, toggleFavorite, onBack }) => {
   return (
-    <div className="container mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-16">
+    <div className="container mx-auto px-4 sm:px-6 pt-8 pb-16">
       <button
         onClick={onBack}
         className="mb-6 flex items-center gap-2 text-blue-400 hover:text-blue-500 transition-colors duration-300"
@@ -189,7 +189,7 @@ const FavoritesPage = ({ favorites, toggleFavorite, onBack }) => {
             <MovieCard
               key={movie.imdbID}
               movie={movie}
-              onClick={() => console.log('Favorite clicked:', movie.imdbID)} // Debugging
+              onClick={() => console.log('Favorite clicked:', movie.imdbID)}
               isFavorite={true}
               toggleFavorite={toggleFavorite}
             />
@@ -231,7 +231,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log('modalOpen:', modalOpen, 'selectedMovieId:', selectedMovieId); // Debugging
+    console.log('modalOpen:', modalOpen, 'selectedMovieId:', selectedMovieId);
   }, [modalOpen, selectedMovieId]);
 
   const fetchMovies = async (searchQuery = '', pageNum = 1, typeFilter = '') => {
@@ -350,7 +350,7 @@ const App = () => {
   };
 
   const handleCardClick = (imdbID) => {
-    console.log('Clicked movie ID:', imdbID); // Debugging
+    console.log('Clicked movie ID:', imdbID);
     setSelectedMovieId(imdbID);
     setModalOpen(true);
   };
@@ -367,7 +367,7 @@ const App = () => {
       <div className="fixed inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/30 to-gray-950/80 z-0 pointer-events-none"></div>
       <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJncmFpbiIgd2lkdGg9IjQiIGhlaWdodD0iNCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgcGF0dGVyblRyYW5zZm9ybT0icm90YXRlKDApIj48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyYWluKSIvPjwvc3ZnPg==')] opacity-10 z-0 pointer-events-none"></div>
 
-      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-gray-950/95 py-2 shadow-2xl backdrop-blur-sm' : 'bg-gradient-to-b from-gray-950/90 to-transparent py-3'}`}>
+      <header className="relative w-full z-50 transition-all duration-500 bg-gradient-to-b from-gray-950/90 to-transparent py-3">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 py-2">
           <div className="flex items-center justify-between w-full sm:w-auto">
             <motion.div
@@ -408,7 +408,7 @@ const App = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-16 relative z-10">
+      <main className="container mx-auto px-4 sm:px-6 pt-8 pb-16 relative z-10">
         {showFavorites ? (
           <FavoritesPage
             favorites={favorites}
@@ -552,7 +552,7 @@ const App = () => {
           <MovieModal
             isOpen={modalOpen}
             onClose={() => {
-              console.log('Closing modal'); // Debugging
+              console.log('Closing modal');
               setModalOpen(false);
               setSelectedMovieId(null);
             }}
