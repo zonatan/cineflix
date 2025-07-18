@@ -1,16 +1,14 @@
 import React from 'react';
 import MovieCard from './MovieCard';
 
-const MovieList = ({ movies, onCardClick }) => {
-  // Jumlah item per baris di berbagai breakpoint
+const MovieList = ({ movies, onCardClick, favorites, toggleFavorite }) => {
   const itemsPerRow = {
-    default: 1,   // mobile
-    sm: 2,        // 640px
-    md: 3,        // 768px
-    lg: 4         // 1024px
+    default: 1,
+    sm: 2,
+    md: 3,
+    lg: 4
   };
 
-  // Hitung jumlah placeholder yang dibutuhkan
   const calculatePlaceholders = (items) => {
     if (items.length === 0) return 0;
     
@@ -21,7 +19,6 @@ const MovieList = ({ movies, onCardClick }) => {
       lg: items.length % itemsPerRow.lg
     };
     
-    // Return max placeholders needed across all breakpoints
     return Math.max(
       remainder.default ? itemsPerRow.default - remainder.default : 0,
       remainder.sm ? itemsPerRow.sm - remainder.sm : 0,
@@ -33,7 +30,6 @@ const MovieList = ({ movies, onCardClick }) => {
   const placeholdersCount = calculatePlaceholders(movies);
   const displayMovies = [...movies];
   
-  // Tambahkan placeholder jika diperlukan
   for (let i = 0; i < placeholdersCount; i++) {
     displayMovies.push({ isPlaceholder: true, id: `placeholder-${i}` });
   }
@@ -47,13 +43,18 @@ const MovieList = ({ movies, onCardClick }) => {
             className="opacity-0 pointer-events-none select-none"
             aria-hidden="true"
             style={{
-              aspectRatio: '2/3' // Mempertahankan aspect ratio yang sama dengan MovieCard
+              aspectRatio: '2/3'
             }}
           >
-            {/* Empty placeholder */}
           </div>
         ) : (
-          <MovieCard key={movie.imdbID} movie={movie} onCardClick={onCardClick} />
+          <MovieCard 
+            key={movie.imdbID} 
+            movie={movie} 
+            onCardClick={onCardClick} 
+            isFavorite={favorites.some(fav => fav.imdbID === movie.imdbID)}
+            toggleFavorite={toggleFavorite}
+          />
         )
       ))}
     </div>
