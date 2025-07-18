@@ -1,36 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiStar, FiClock, FiCalendar, FiAward, FiGlobe } from 'react-icons/fi';
-import { FaImdb } from 'react-icons/fa';
+import { FiX, FiStar, FiClock, FiCalendar, FiAward, FiGlobe, FiPlay, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FaImdb, FaHeart, FaRegHeart } from 'react-icons/fa';
 
-const MovieModal = ({ isOpen, onClose, imdbID }) => {
+const MovieModal = ({ isOpen, onClose, movieId, favorites, toggleFavorite }) => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    if (isOpen && imdbID) {
+    if (isOpen && movieId) {
       setLoading(true);
       setError(null);
       axios
-        .get(`https://www.omdbapi.com/?i=${imdbID}&apikey=${process.env.REACT_APP_API_MOVIE_KEY}`)
+        .get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.REACT_APP_TMDB_API_KEY}&append_to_response=videos,credits`)
         .then((response) => {
-          if (response.data.Response === 'True') {
-            setMovieDetails(response.data);
-          } else {
-            setError(response.data.Error);
-          }
+          const movie = response.data;
+          const trailer = movie.videos.results.find(
+            (video) => video.type === 'Trailer' && video.site === 'YouTube'
+          );
+          setMovieDetails({
+            imdbID: movie.id.toString(),
+            Title: movie.title,
+            Year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
+            Poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'N/A',
+            profileImage: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'N/A',
+            coverImage: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : 'N/A',
+            trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
+            Type: 'movie',
+            Rated: movie.adult ? 'R' : 'PG-13',
+            Runtime: movie.runtime ? `${movie.runtime} min` : 'N/A',
+            Genre: movie.genres.map(genre => genre.name).join(', '),
+            Plot: movie.overview || 'N/A',
+            Director: movie.credits.crew.find(crew => crew.job === 'Director')?.name || 'N/A',
+            Writer: movie.credits.crew.filter(crew => crew.job === 'Writer').map(w => w.name).join(', ') || 'N/A',
+            Actors: movie.credits.cast.slice(0, 3).map(actor => actor.name).join(', ') || 'N/A',
+            Language: movie.spoken_languages.map(lang => lang.name).join(', ') || 'N/A',
+            Country: movie.production_countries.map(country => country.name).join(', ') || 'N/A',
+            Awards: 'N/A',
+            imdbRating: movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A',
+            BoxOffice: movie.revenue ? `$${movie.revenue.toLocaleString()}` : 'N/A',
+            Production: movie.production_companies.map(company => company.name).join(', ') || 'N/A',
+            Website: movie.homepage || 'N/A',
+            DVD: movie.release_date || 'N/A',
+          });
           setLoading(false);
         })
         .catch(() => {
-          setError('Failed to fetch movie details.');
+          setError('Gagal memuat detail film.');
           setLoading(false);
         });
     }
-  }, [isOpen, imdbID]);
+  }, [isOpen, movieId]);
 
-  // Menutup modal saat tombol Esc ditekan
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') onClose();
@@ -38,6 +62,20 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
+
+  const isFavorite = movieDetails && favorites.some(fav => fav.imdbID === movieDetails.imdbID);
+
+  const images = movieDetails
+    ? [movieDetails.coverImage || movieDetails.Poster, movieDetails.coverImage].filter(img => img && img !== 'N/A')
+    : [];
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   if (!isOpen) return null;
 
@@ -52,7 +90,7 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
         onClick={onClose}
         role="dialog"
         aria-modal="true"
-        aria-label="Movie Details Modal"
+        aria-label="Detail Film"
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -65,7 +103,7 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
           <button
             onClick={onClose}
             className="absolute top-3 right-3 z-50 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded-full p-2 backdrop-blur-sm border border-gray-600/30 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Close modal"
+            aria-label="Tutup modal"
           >
             <FiX size={20} />
           </button>
@@ -85,30 +123,54 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
           {error && (
             <div className="flex flex-col items-center justify-center h-96 p-6 text-center">
               <div className="text-5xl mb-4">🎬</div>
-              <h3 className="text-xl font-bold text-white mb-2">Oops, something went wrong!</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Oops, terjadi kesalahan!</h3>
               <p className="text-gray-400 mb-4">{error}</p>
               <button
                 onClick={() => {
                   setLoading(true);
                   setError(null);
                   axios
-                    .get(`https://www.omdbapi.com/?i=${imdbID}&apikey=${process.env.REACT_APP_API_MOVIE_KEY}`)
+                    .get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.REACT_APP_TMDB_API_KEY}&append_to_response=videos,credits`)
                     .then((response) => {
-                      if (response.data.Response === 'True') {
-                        setMovieDetails(response.data);
-                      } else {
-                        setError(response.data.Error);
-                      }
+                      const movie = response.data;
+                      const trailer = movie.videos.results.find(
+                        (video) => video.type === 'Trailer' && video.site === 'YouTube'
+                      );
+                      setMovieDetails({
+                        imdbID: movie.id.toString(),
+                        Title: movie.title,
+                        Year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
+                        Poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'N/A',
+                        profileImage: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'N/A',
+                        coverImage: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : 'N/A',
+                        trailerUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
+                        Type: 'movie',
+                        Rated: movie.adult ? 'R' : 'PG-13',
+                        Runtime: movie.runtime ? `${movie.runtime} min` : 'N/A',
+                        Genre: movie.genres.map(genre => genre.name).join(', '),
+                        Plot: movie.overview || 'N/A',
+                        Director: movie.credits.crew.find(crew => crew.job === 'Director')?.name || 'N/A',
+                        Writer: movie.credits.crew.filter(crew => crew.job === 'Writer').map(w => w.name).join(', ') || 'N/A',
+                        Actors: movie.credits.cast.slice(0, 3).map(actor => actor.name).join(', ') || 'N/A',
+                        Language: movie.spoken_languages.map(lang => lang.name).join(', ') || 'N/A',
+                        Country: movie.production_countries.map(country => country.name).join(', ') || 'N/A',
+                        Awards: 'N/A',
+                        imdbRating: movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A',
+                        BoxOffice: movie.revenue ? `$${movie.revenue.toLocaleString()}` : 'N/A',
+                        Production: movie.production_companies.map(company => company.name).join(', ') || 'N/A',
+                        Website: movie.homepage || 'N/A',
+                        DVD: movie.release_date || 'N/A',
+                      });
                       setLoading(false);
                     })
                     .catch(() => {
-                      setError('Failed to fetch movie details.');
+                      setError('Gagal memuat detail film.');
                       setLoading(false);
                     });
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Retry
+                Coba Lagi
               </button>
             </div>
           )}
@@ -120,18 +182,59 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
               transition={{ duration: 0.4, delay: 0.1 }}
             >
               <div className="relative h-60 sm:h-72 md:h-80 w-full">
+                <div className="relative w-full h-full">
+                  {images.length > 0 ? (
+                    <>
+                      <img
+                        src={images[currentImageIndex] || 'https://via.placeholder.com/800x450/1a1a2e/ffffff?text=Tidak+Ada+Poster'}
+                        className="w-full h-60 sm:h-72 md:h-80 object-cover"
+                        alt={`${movieDetails.Title} ${currentImageIndex === 0 ? 'Sampul' : 'Profil'}`}
+                        loading="lazy"
+                      />
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            onClick={handlePrevImage}
+                            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded-full p-2 transition"
+                            aria-label="Gambar sebelumnya"
+                          >
+                            <FiChevronLeft size={20} />
+                          </button>
+                          <button
+                            onClick={handleNextImage}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded-full p-2 transition"
+                            aria-label="Gambar berikutnya"
+                          >
+                            <FiChevronRight size={20} />
+                          </button>
+                          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                            {images.map((_, index) => (
+                              <button
+                                key={index}
+                                className={`w-2 h-2 rounded-full ${index === currentImageIndex ? 'bg-blue-500' : 'bg-gray-500/50'}`}
+                                onClick={() => setCurrentImageIndex(index)}
+                                aria-label={`Ke gambar ${index + 1}`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <img
+                      src={movieDetails.Poster !== 'N/A' ? movieDetails.Poster : 'https://via.placeholder.com/800x450/1a1a2e/ffffff?text=Tidak+Ada+Poster'}
+                      className="w-full h-60 sm:h-72 md:h-80 object-cover"
+                      alt={movieDetails.Title}
+                      loading="lazy"
+                    />
+                  )}
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-transparent z-10"></div>
-                <img
-                  src={movieDetails.Poster !== 'N/A' ? movieDetails.Poster : 'https://via.placeholder.com/800x450/1a1a2e/ffffff?text=No+Poster'}
-                  className="w-full h-full object-cover"
-                  alt={movieDetails.Title}
-                  loading="lazy"
-                />
                 <div className="absolute bottom-0 left-0 right-0 z-20 p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-end gap-4">
                     <div className="w-28 sm:w-32 h-40 sm:h-48 rounded-lg overflow-hidden shadow-lg border border-white/10">
                       <img
-                        src={movieDetails.Poster !== 'N/A' ? movieDetails.Poster : 'https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Poster'}
+                        src={movieDetails.profileImage || movieDetails.Poster !== 'N/A' ? movieDetails.Poster : 'https://via.placeholder.com/300x450/1a1a2e/ffffff?text=Tidak+Ada+Poster'}
                         className="w-full h-full object-cover"
                         alt={movieDetails.Title}
                         loading="lazy"
@@ -167,6 +270,25 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
               </div>
 
               <div className="p-4 sm:p-6">
+                <div className="flex gap-4 mb-6">
+                  {movieDetails.trailerUrl && (
+                    <a
+                      href={movieDetails.trailerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <FiPlay size={16} /> Tonton Trailer
+                    </a>
+                  )}
+                  <button
+                    onClick={() => toggleFavorite(movieDetails)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {isFavorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
+                    {isFavorite ? 'Hapus dari Favorit' : 'Tambah ke Favorit'}
+                  </button>
+                </div>
                 {movieDetails.Genre && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -191,7 +313,7 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                     transition={{ duration: 0.3, delay: 0.3 }}
                     className="mb-6"
                   >
-                    <h3 className="text-lg font-bold text-white mb-2">Synopsis</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">Sinopsis</h3>
                     <p className="text-gray-200 leading-relaxed text-sm sm:text-base">{movieDetails.Plot}</p>
                   </motion.div>
                 )}
@@ -204,19 +326,19 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                   <div>
                     {movieDetails.Director && movieDetails.Director !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Director</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Sutradara</h4>
                         <p className="text-gray-100 text-sm">{movieDetails.Director}</p>
                       </div>
                     )}
                     {movieDetails.Writer && movieDetails.Writer !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Writer</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Penulis</h4>
                         <p className="text-gray-100 text-sm">{movieDetails.Writer}</p>
                       </div>
                     )}
                     {movieDetails.Actors && movieDetails.Actors !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Cast</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Pemeran</h4>
                         <p className="text-gray-100 text-sm">{movieDetails.Actors}</p>
                       </div>
                     )}
@@ -224,7 +346,7 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                   <div>
                     {movieDetails.Language && movieDetails.Language !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Language</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Bahasa</h4>
                         <p className="text-gray-100 text-sm flex items-center gap-1">
                           <FiGlobe size={14} className="text-blue-400" /> {movieDetails.Language}
                         </p>
@@ -232,13 +354,13 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                     )}
                     {movieDetails.Country && movieDetails.Country !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Country</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Negara</h4>
                         <p className="text-gray-100 text-sm">{movieDetails.Country}</p>
                       </div>
                     )}
                     {movieDetails.Awards && movieDetails.Awards !== 'N/A' && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Awards</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 mb-1">Penghargaan</h4>
                         <p className="text-gray-100 text-sm flex items-center gap-1">
                           <FiAward size={14} className="text-yellow-400" /> {movieDetails.Awards}
                         </p>
@@ -262,7 +384,7 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                       )}
                       {movieDetails.Production && movieDetails.Production !== 'N/A' && (
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-400 mb-1">Production</h4>
+                          <h4 className="text-xs font-semibold text-gray-400 mb-1">Produksi</h4>
                           <p className="text-gray-100 text-sm">{movieDetails.Production}</p>
                         </div>
                       )}
@@ -275,13 +397,13 @@ const MovieModal = ({ isOpen, onClose, imdbID }) => {
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 text-sm transition"
                           >
-                            Visit Site
+                            Kunjungi Situs
                           </a>
                         </div>
                       )}
                       {movieDetails.DVD && movieDetails.DVD !== 'N/A' && (
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-400 mb-1">Release Date</h4>
+                          <h4 className="text-xs font-semibold text-gray-400 mb-1">Tanggal Rilis</h4>
                           <p className="text-gray-100 text-sm">{movieDetails.DVD}</p>
                         </div>
                       )}

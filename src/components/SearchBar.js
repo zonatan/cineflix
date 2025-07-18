@@ -17,7 +17,7 @@ const SearchBar = ({ onSearch }) => {
         <input
           type="text"
           className="w-full bg-gray-800 border border-gray-700 text-white rounded-full px-5 py-3 pl-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Search for movies, series..."
+          placeholder="Cari film atau series..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
