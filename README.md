@@ -1,18 +1,19 @@
 # 🎬 Cineflix
 
-**Cineflix** is a modern movie search app built with **React**, **Tailwind CSS**, and **Framer Motion**, powered by the **OMDb API**. It features a sleek and responsive UI with dynamic search, type filters, animated modals, and search history. Ideal for movie lovers who want a stylish and fast way to explore films.
+**Cineflix** is a modern movie search app built with **React**, **Tailwind CSS**, and **Framer Motion**, powered by the **TMDB API**. It features a sleek and responsive UI with dynamic search, type filters, animated modals, search history, and favorites. Ideal for movie and series lovers who want a stylish and fast way to explore content.
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Search Movies** – Real-time search using OMDb API.
-- 🎯 **Type Filters** – Filter by movie, series, or episode.
+- 🔍 **Search Movies and Series** – Real-time search using TMDB API.
+- 🎯 **Type Filters** – Filter by movie or series.
 - 📚 **Search History** – Stores recent searches via `localStorage`.
-- 🖼️ **Responsive Grid** – 12 movies per page in a 3x4 or 4x3 layout.
-- 🎬 **Animated Modals** – Smooth transitions with Framer Motion.
+- 🖼️ **Responsive Grid** – 18 movies per page in a responsive grid layout.
+- 🎬 **Animated Modals** – Smooth transitions with Framer Motion for movie/series details.
 - 💅 **Modern UI** – Gradient backgrounds, blur effects, and custom loaders.
 - 🔄 **Pagination** – Easy navigation with Next & Previous buttons.
+- ❤️ **Favorites** – Save favorite movies and series to `localStorage`.
 
 ---
 
@@ -23,7 +24,7 @@
 | ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) | Frontend framework |
 | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) | Styling framework |
 | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white) | Animation library |
-| ![OMDb API](https://img.shields.io/badge/OMDb_API-000000?style=for-the-badge) | Movie data source |
+| ![TMDB API](https://img.shields.io/badge/TMDB_API-01B4E4?style=for-the-badge) | Movie and series data source |
 | ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white) | API requests |
 
 # Getting Started with Create React App
